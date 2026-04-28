@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Web3.0 Personality Test</title>
+    <link rel="stylesheet" href="style_new.css">
+</head>
+<body>
+    <canvas id="bg-canvas"></canvas>
+
+    <div class="container">
+        <div class="page active" id="start-page">
+            <div class="corner-deco top-left"></div>
+            <div class="corner-deco top-right"></div>
+            <div class="corner-deco bottom-left"></div>
+            <div class="corner-deco bottom-right"></div>
+
+            <div class="side-deco left-deco">
+                <div class="deco-line"></div>
+                <div class="deco-dot" style="top: 20%;"></div>
+                <div class="deco-dot" style="top: 50%;"></div>
+                <div class="deco-dot" style="top: 80%;"></div>
+                <div class="deco-hex" style="top: 35%;"></div>
+                <div class="deco-hex" style="top: 65%;"></div>
+            </div>
+            <div class="side-deco right-deco">
+                <div class="deco-line"></div>
+                <div class="deco-dot" style="top: 20%;"></div>
+                <div class="deco-dot" style="top: 50%;"></div>
+                <div class="deco-dot" style="top: 80%;"></div>
+                <div class="deco-hex" style="top: 35%;"></div>
+                <div class="deco-hex" style="top: 65%;"></div>
+            </div>
+
+            <div class="content">
+                <div class="logo-icon">&#x2B22;</div>
+                <h1>Web3.0 Personality Test</h1>
+                <p class="subtitle">Discover your true Web3 identity</p>
+                <p class="description">Answer 8 questions across 4 dimensions: Risk, Motivation, Time, and Social style. Find out if you're an Alpha Hunter, a Diamond Hand Pro, or something entirely different.</p>
+                <div class="dimension-preview">
+                    <span class="dim-chip">Risk</span>
+                    <span class="dim-chip">Motivation</span>
+                    <span class="dim-chip">Time</span>
+                    <span class="dim-chip">Social</span>
+                </div>
+                <button class="btn btn-primary" id="start-btn">Start Test</button>
+            </div>
+        </div>
+
+        <div class="page" id="test-page">
+            <div class="corner-deco top-left"></div>
+            <div class="corner-deco top-right"></div>
+            <div class="corner-deco bottom-left"></div>
+            <div class="corner-deco bottom-right"></div>
+
+            <div class="content">
+                <div class="progress-track">
+                    <div class="progress-fill" id="progress-fill"></div>
+                </div>
+                <div class="question-header">
+                    <span class="question-num" id="question-num">Q1</span>
+                    <span class="dim-tag" id="dim-tag">Risk</span>
+                </div>
+                <h2 id="question-text">Loading...</h2>
+                <div class="options" id="options-container"></div>
+                <div class="nav-row">
+                    <button class="btn btn-ghost" id="prev-btn" disabled>Previous</button>
+                    <button class="btn btn-primary" id="next-btn">Next</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="page" id="result-page">
+            <div class="corner-deco top-left"></div>
+            <div class="corner-deco top-right"></div>
+            <div class="corner-deco bottom-left"></div>
+            <div class="corner-deco bottom-right"></div>
+
+            <div class="content">
+                <div class="result-card">
+                    <div class="type-code" id="type-code">----</div>
+                    <h2 id="personality-name">Your Personality</h2>
+                    <div class="dim-tags" id="dim-tags"></div>
+                    <div class="dimension-scores">
+                        <div class="score-row" id="score-risk">
+                            <div class="score-labels">
+                                <span class="label-left">Degen</span>
+                                <span class="label-right">Safe</span>
+                            </div>
+                            <div class="dual-bar">
+                                <div class="bar-left" id="risk-bar-left"></div>
+                                <div class="bar-divider"></div>
+                                <div class="bar-right" id="risk-bar-right"></div>
+                            </div>
+                            <div class="score-pcts">
+                                <span id="risk-pct-left">0%</span>
+                                <span id="risk-pct-right">0%</span>
+                            </div>
+                        </div>
+                        <div class="score-row" id="score-motivation">
+                            <div class="score-labels">
+                                <span class="label-left">Utility</span>
+                                <span class="label-right">Lore</span>
+                            </div>
+                            <div class="dual-bar">
+                                <div class="bar-left" id="motivation-bar-left"></div>
+                                <div class="bar-divider"></div>
+                                <div class="bar-right" id="motivation-bar-right"></div>
+                            </div>
+                            <div class="score-pcts">
+                                <span id="motivation-pct-left">0%</span>
+                                <span id="motivation-pct-right">0%</span>
+                            </div>
+                        </div>
+                        <div class="score-row" id="score-time">
+                            <div class="score-labels">
+                                <span class="label-left">Sniper</span>
+                                <span class="label-right">HODLer</span>
+                            </div>
+                            <div class="dual-bar">
+                                <div class="bar-left" id="time-bar-left"></div>
+                                <div class="bar-divider"></div>
+                                <div class="bar-right" id="time-bar-right"></div>
+                            </div>
+                            <div class="score-pcts">
+                                <span id="time-pct-left">0%</span>
+                                <span id="time-pct-right">0%</span>
+                            </div>
+                        </div>
+                        <div class="score-row" id="score-social">
+                            <div class="score-labels">
+                                <span class="label-left">Anon</span>
+                                <span class="label-right">Public</span>
+                            </div>
+                            <div class="dual-bar">
+                                <div class="bar-left" id="social-bar-left"></div>
+                                <div class="bar-divider"></div>
+                                <div class="bar-right" id="social-bar-right"></div>
+                            </div>
+                            <div class="score-pcts">
+                                <span id="social-pct-left">0%</span>
+                                <span id="social-pct-right">0%</span>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="personality-desc" id="personality-desc">Loading...</p>
+                </div>
+                <div class="action-row">
+                    <button class="btn btn-outline" id="share-btn">Share Result</button>
+                    <button class="btn btn-ghost" id="retake-btn">Retake Test</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast">Result copied to clipboard!</div>
+
+    <script src="script_new.js"></script>
+</body>
+</html>
