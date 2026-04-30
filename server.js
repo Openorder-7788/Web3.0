@@ -15,7 +15,7 @@ connectDB();
 app.use(helmet({ contentSecurityPolicy: false }));
 app.use(cors({
   origin: process.env.NODE_ENV === 'production'
-    ? ['https://your-domain.com']
+    ? ['https://web3test.memolabs.net']
     : ['http://localhost:3000', 'http://127.0.0.1:3000'],
   credentials: true
 }));
