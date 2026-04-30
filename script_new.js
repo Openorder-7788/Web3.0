@@ -1,93 +1,213 @@
-const questions = [
-    {
-        id: 1,
-        dimension: 'Risk',
-        text: 'Found a new project with no audit report, but KOLs are shilling it hard on Twitter. What do you do?',
-        options: [
-            { text: 'Go all in! Hesitating for a second is disrespectful to wealth. If it goes to zero, it\'s just tuition.', score: { degen: 2, safe: 0 } },
-            { text: 'Dip 0.1 ETH to test the waters, watch community reaction, and pull out if it dumps.', score: { degen: 1, safe: 0 } },
-            { text: 'Add to watchlist, wait three months to confirm no rug and an audit report exists.', score: { degen: 0, safe: 1 } },
-            { text: 'I don\'t touch shitcoins. My money only goes into time-tested blue-chip projects.', score: { degen: 0, safe: 2 } }
-        ]
-    },
-    {
-        id: 2,
-        dimension: 'Risk',
-        text: 'Where do you usually store your private key mnemonic?',
-        options: [
-            { text: 'Don\'t bother memorizing — keep it in a hot wallet for easy access to shitcoins. Lose it, earn more.', score: { degen: 2, safe: 0 } },
-            { text: 'Memorized or saved in phone notes, as long as I don\'t share it with anyone.', score: { degen: 1, safe: 0 } },
-            { text: 'Written on paper, locked in a drawer, and occasionally use a hardware wallet.', score: { degen: 0, safe: 1 } },
-            { text: 'Engraved on fireproof, magnetic-resistant steel, stored in a bank safe with multi-signature.', score: { degen: 0, safe: 2 } }
-        ]
-    },
-    {
-        id: 3,
-        dimension: 'Motivation',
-        text: 'What is your main reason for buying an NFT?',
-        options: [
-            { text: 'Clear roadmap with staking rewards and utility as in-game items.', score: { utility: 2, lore: 0 } },
-            { text: 'Strong tech foundation or a domain on a major chain with practical use cases.', score: { utility: 1, lore: 0 } },
-            { text: 'Amazing community vibes, everyone\'s making memes, and the art matches my aesthetic.', score: { utility: 0, lore: 1 } },
-            { text: 'To support the artist and gain access to an exclusive circle and its story.', score: { utility: 0, lore: 2 } }
-        ]
-    },
-    {
-        id: 4,
-        dimension: 'Motivation',
-        text: 'When you see "This is good for Crypto", what\'s your first reaction?',
-        options: [
-            { text: 'It\'s a technical catalyst. I need to research its impact on TPS or interoperability.', score: { utility: 2, lore: 0 } },
-            { text: 'It\'s a market signal — money is incoming. Let\'s find which coin will pump.', score: { utility: 1, lore: 0 } },
-            { text: 'Haha, meme time! Let\'s turn this into a sticker and spam the group chat.', score: { utility: 0, lore: 1 } },
-            { text: 'It\'s a statement of faith. Whatever happens, as long as we\'re on-chain, it\'s good.', score: { utility: 0, lore: 2 } }
-        ]
-    },
-    {
-        id: 5,
-        dimension: 'Time',
-        text: 'What is your typical holding period?',
-        options: [
-            { text: 'Minutes to hours. I\'m a scalper — take profits and never hold overnight.', score: { sniper: 2, hodler: 0 } },
-            { text: 'Days to weeks. I rotate with market trends and ride each wave.', score: { sniper: 1, hodler: 0 } },
-            { text: 'Months to a year. I believe in this sector and will take profits at my target price.', score: { sniper: 0, hodler: 1 } },
-            { text: 'Years, even planning to pass to my grandchildren. I won\'t sell unless Bitcoin dies.', score: { sniper: 0, hodler: 2 } }
-        ]
-    },
-    {
-        id: 6,
-        dimension: 'Time',
-        text: 'When the market crashes 50%, what do you do?',
-        options: [
-            { text: 'Quickly stop loss to preserve capital, or go short to profit from the crash.', score: { sniper: 2, hodler: 0 } },
-            { text: 'Nervously watching the charts, looking for bounce opportunities to average down.', score: { sniper: 1, hodler: 0 } },
-            { text: 'A bit panicked but choose to lie flat, close the app and go to work.', score: { sniper: 0, hodler: 1 } },
-            { text: 'Excitedly change my wallpaper to "Buy the Dip" and deploy all my savings.', score: { sniper: 0, hodler: 2 } }
-        ]
-    },
-    {
-        id: 7,
-        dimension: 'Social',
-        text: 'What is your usual status in Discord?',
-        options: [
-            { text: 'Always invisible. Only read announcements. Typing feels like wasting gas.', score: { anon: 2, public: 0 } },
-            { text: 'Occasionally drop memes in general, or only speak when @mentioned.', score: { anon: 1, public: 0 } },
-            { text: 'Frequently join discussions, help newcomers, and occasionally attend events.', score: { anon: 0, public: 1 } },
-            { text: 'I\'m an admin or mod, actively organize events, even host AMAs in voice channels.', score: { anon: 0, public: 2 } }
-        ]
-    },
-    {
-        id: 8,
-        dimension: 'Social',
-        text: 'What is your Twitter profile like?',
-        options: [
-            { text: 'No avatar (or default), no bio, no tweets. Looks like a bot.', score: { anon: 2, public: 0 } },
-            { text: 'Only retweets, no original content. Like a soulless shilling machine.', score: { anon: 1, public: 0 } },
-            { text: 'Occasionally post about life or market views, with some interaction.', score: { anon: 0, public: 1 } },
-            { text: 'Full of in-depth project analysis, profit screenshots, debates with other KOLs. More followers than following.', score: { anon: 0, public: 2 } }
-        ]
-    }
-];
+const questionBank = {
+    Risk: [
+        {
+            id: 'r1',
+            text: 'Found a new project with no audit report, but KOLs are shilling it hard on Twitter. What do you do?',
+            options: [
+                { text: 'Go all in! Hesitating for a second is disrespectful to wealth. If it goes to zero, it\'s just tuition.', score: { degen: 2, safe: 0 } },
+                { text: 'Dip 0.1 ETH to test the waters, watch community reaction, and pull out if it dumps.', score: { degen: 1, safe: 0 } },
+                { text: 'Add to watchlist, wait three months to confirm no rug and an audit report exists.', score: { degen: 0, safe: 1 } },
+                { text: 'I don\'t touch shitcoins. My money only goes into time-tested blue-chip projects.', score: { degen: 0, safe: 2 } }
+            ]
+        },
+        {
+            id: 'r2',
+            text: 'Where do you usually store your private key mnemonic?',
+            options: [
+                { text: 'Don\'t bother memorizing — keep it in a hot wallet for easy access to shitcoins. Lose it, earn more.', score: { degen: 2, safe: 0 } },
+                { text: 'Memorized or saved in phone notes, as long as I don\'t share it with anyone.', score: { degen: 1, safe: 0 } },
+                { text: 'Written on paper, locked in a drawer, and occasionally use a hardware wallet.', score: { degen: 0, safe: 1 } },
+                { text: 'Engraved on fireproof, magnetic-resistant steel, stored in a bank safe with multi-signature.', score: { degen: 0, safe: 2 } }
+            ]
+        },
+        {
+            id: 'r3',
+            text: 'When you see a shitcoin mining pool on-chain with an APY of up to 50,000%, what is your first reaction?',
+            options: [
+                { text: 'Rush in immediately. Even if I only stay for a few minutes, I want to farm that wave of profit and run.', score: { degen: 2, safe: 0 } },
+                { text: 'Throw in a little money to test the waters, see if I can break even.', score: { degen: 1, safe: 0 } },
+                { text: 'This kind of high yield is definitely unsustainable, probably a Ponzi scheme. I\'m not participating.', score: { degen: 0, safe: 1 } },
+                { text: 'I won\'t even click on that link, afraid my wallet will get drained by a malicious approval.', score: { degen: 0, safe: 2 } }
+            ]
+        },
+        {
+            id: 'r4',
+            text: 'If a friend recommends a "guaranteed profit, zero risk" yield protocol to you, but the code is unaudited, what do you do?',
+            options: [
+                { text: 'Since a friend recommended it, it must be fine. Ape in directly!', score: { degen: 2, safe: 0 } },
+                { text: 'I\'ll put in a small portion first to see if I can withdraw normally.', score: { degen: 1, safe: 0 } },
+                { text: 'I\'ll ask my friend for the audit link, otherwise I won\'t trust it.', score: { degen: 0, safe: 1 } },
+                { text: 'I\'ll tell them that unaudited code is a ticking time bomb, stay away from it.', score: { degen: 0, safe: 2 } }
+            ]
+        },
+        {
+            id: 'r5',
+            text: 'When trading on a DEX, what is your usual slippage setting?',
+            options: [
+                { text: 'Above 10%. As long as the transaction goes through, I don\'t care about spending a bit extra!', score: { degen: 2, safe: 0 } },
+                { text: 'Around 5%, adjust depending on the situation. As long as I can buy in, it\'s fine.', score: { degen: 1, safe: 0 } },
+                { text: 'Around 1%. Try to execute at market price, don\'t want to spend extra.', score: { degen: 0, safe: 1 } },
+                { text: 'Below 0.5%. I must precisely control costs, even if it means a few failed transactions.', score: { degen: 0, safe: 2 } }
+            ]
+        }
+    ],
+    Motivation: [
+        {
+            id: 'm1',
+            text: 'What is your main reason for buying an NFT?',
+            options: [
+                { text: 'Clear roadmap with staking rewards and utility as in-game items.', score: { utility: 2, lore: 0 } },
+                { text: 'Strong tech foundation or a domain on a major chain with practical use cases.', score: { utility: 1, lore: 0 } },
+                { text: 'Amazing community vibes, everyone\'s making memes, and the art matches my aesthetic.', score: { utility: 0, lore: 1 } },
+                { text: 'To support the artist and gain access to an exclusive circle and its story.', score: { utility: 0, lore: 2 } }
+            ]
+        },
+        {
+            id: 'm2',
+            text: 'When you see "This is good for Crypto", what\'s your first reaction?',
+            options: [
+                { text: 'It\'s a technical catalyst. I need to research its impact on TPS or interoperability.', score: { utility: 2, lore: 0 } },
+                { text: 'It\'s a market signal — money is incoming. Let\'s find which coin will pump.', score: { utility: 1, lore: 0 } },
+                { text: 'Haha, meme time! Let\'s turn this into a sticker and spam the group chat.', score: { utility: 0, lore: 1 } },
+                { text: 'It\'s a statement of faith. Whatever happens, as long as we\'re on-chain, it\'s good.', score: { utility: 0, lore: 2 } }
+            ]
+        },
+        {
+            id: 'm3',
+            text: 'What is your take on "Meme coins" (like Doge, Shiba, etc.)?',
+            options: [
+                { text: 'They have no real utility, purely gambling tools. I don\'t touch them.', score: { utility: 2, lore: 0 } },
+                { text: 'They are fun, but too risky. I\'ll only play with a very small amount of funds.', score: { utility: 1, lore: 0 } },
+                { text: 'They represent the power of the community and internet culture; they hold value.', score: { utility: 0, lore: 1 } },
+                { text: 'They are the embodiment of the Web3 spirit: decentralized and community-driven, way better than those VC coins!', score: { utility: 0, lore: 2 } }
+            ]
+        },
+        {
+            id: 'm4',
+            text: 'What type of project are you more inclined to invest in?',
+            options: [
+                { text: 'DeFi protocols with mature products, steady revenue, and clear business models.', score: { utility: 2, lore: 0 } },
+                { text: 'Layer 1 or Layer 2 blockchains with strong tech teams and clear roadmaps.', score: { utility: 1, lore: 0 } },
+                { text: 'NFT projects with a unique worldview, strong community consensus, and rich derivative content.', score: { utility: 0, lore: 1 } },
+                { text: 'Meme projects with distinct personalities, viral transmission capabilities, and deep cultural memes.', score: { utility: 0, lore: 2 } }
+            ]
+        },
+        {
+            id: 'm5',
+            text: 'When browsing a project\'s whitepaper, what do you pay the most attention to?',
+            options: [
+                { text: 'Tokenomics model, inflation rate, vesting/unlocking schedule.', score: { utility: 2, lore: 0 } },
+                { text: 'Technical architecture, consensus mechanism, performance metrics.', score: { utility: 1, lore: 0 } },
+                { text: 'Team background, community vision, project lore/story.', score: { utility: 0, lore: 1 } },
+                { text: 'Whether the logo looks good, if the website is cool, and if the community vibe is lively.', score: { utility: 0, lore: 2 } }
+            ]
+        }
+    ],
+    Time: [
+        {
+            id: 't1',
+            text: 'What is your typical holding period?',
+            options: [
+                { text: 'Minutes to hours. I\'m a scalper — take profits and never hold overnight.', score: { sniper: 2, hodler: 0 } },
+                { text: 'Days to weeks. I rotate with market trends and ride each wave.', score: { sniper: 1, hodler: 0 } },
+                { text: 'Months to a year. I believe in this sector and will take profits at my target price.', score: { sniper: 0, hodler: 1 } },
+                { text: 'Years, even planning to pass to my grandchildren. I won\'t sell unless Bitcoin dies.', score: { sniper: 0, hodler: 2 } }
+            ]
+        },
+        {
+            id: 't2',
+            text: 'When the market crashes 50%, what do you do?',
+            options: [
+                { text: 'Quickly stop loss to preserve capital, or go short to profit from the crash.', score: { sniper: 2, hodler: 0 } },
+                { text: 'Nervously watching the charts, looking for bounce opportunities to average down.', score: { sniper: 1, hodler: 0 } },
+                { text: 'A bit panicked but choose to lie flat, close the app and go to work.', score: { sniper: 0, hodler: 1 } },
+                { text: 'Excitedly change my wallpaper to "Buy the Dip" and deploy all my savings.', score: { sniper: 0, hodler: 2 } }
+            ]
+        },
+        {
+            id: 't3',
+            text: 'How do you usually manage your portfolio?',
+            options: [
+                { text: 'I check prices at least three times a day and frequently rebalance based on market volatility.', score: { sniper: 2, hodler: 0 } },
+                { text: 'I review once a week and adjust my positions based on market trends.', score: { sniper: 1, hodler: 0 } },
+                { text: 'I check once a month. As long as the macro direction hasn\'t changed, I don\'t touch it.', score: { sniper: 0, hodler: 1 } },
+                { text: 'I rarely check prices. I believe time is the friend of quality assets.', score: { sniper: 0, hodler: 2 } }
+            ]
+        },
+        {
+            id: 't4',
+            text: 'A project you\'ve held long-term suddenly announces massive negative news (e.g., team disbands, core feature fails). What do you do?',
+            options: [
+                { text: 'Sell everything immediately, stop the loss, and look for the next opportunity.', score: { sniper: 2, hodler: 0 } },
+                { text: 'Sell a portion first, observe subsequent developments before deciding.', score: { sniper: 1, hodler: 0 } },
+                { text: 'I will continue to hold, believing the community can get through the hardship.', score: { sniper: 0, hodler: 1 } },
+                { text: 'I might even add to my position, believing this is the final shakeout.', score: { sniper: 0, hodler: 2 } }
+            ]
+        },
+        {
+            id: 't5',
+            text: 'What is your view on "Bull Markets" and "Bear Markets"?',
+            options: [
+                { text: 'Bull markets are for making money, bear markets are for losing it, so you must perfectly time the top and bottom.', score: { sniper: 2, hodler: 0 } },
+                { text: 'Make more in a bull market, lose less in a bear market. Go with the flow.', score: { sniper: 1, hodler: 0 } },
+                { text: 'Bull markets are bubbles, bear markets are opportunities. Be greedy when others are fearful.', score: { sniper: 0, hodler: 1 } },
+                { text: 'Bull and bear are just cycles. True believers don\'t care about this, just keep holding.', score: { sniper: 0, hodler: 2 } }
+            ]
+        }
+    ],
+    Social: [
+        {
+            id: 's1',
+            text: 'What is your usual status in Discord?',
+            options: [
+                { text: 'Always invisible. Only read announcements. Typing feels like wasting gas.', score: { anon: 2, public: 0 } },
+                { text: 'Occasionally drop memes in general, or only speak when @mentioned.', score: { anon: 1, public: 0 } },
+                { text: 'Frequently join discussions, help newcomers, and occasionally attend events.', score: { anon: 0, public: 1 } },
+                { text: 'I\'m an admin or mod, actively organize events, even host AMAs in voice channels.', score: { anon: 0, public: 2 } }
+            ]
+        },
+        {
+            id: 's2',
+            text: 'What is your Twitter profile like?',
+            options: [
+                { text: 'No avatar (or default), no bio, no tweets. Looks like a bot.', score: { anon: 2, public: 0 } },
+                { text: 'Only retweets, no original content. Like a soulless shilling machine.', score: { anon: 1, public: 0 } },
+                { text: 'Occasionally post about life or market views, with some interaction.', score: { anon: 0, public: 1 } },
+                { text: 'Full of in-depth project analysis, profit screenshots, debates with other KOLs. More followers than following.', score: { anon: 0, public: 2 } }
+            ]
+        },
+        {
+            id: 's3',
+            text: 'Are you willing to reveal your real identity or wallet address in public (like Twitter, Discord)?',
+            options: [
+                { text: 'Absolutely not. My anonymity is more important than anything.', score: { anon: 2, public: 0 } },
+                { text: 'Only reveal it in a small circle of trust, but remain anonymous in public.', score: { anon: 1, public: 0 } },
+                { text: 'If I\'m confident in a project, I\'ll publicly show my holdings to show support.', score: { anon: 0, public: 1 } },
+                { text: 'Of course. I am who I am, I take responsibility for my words and investments. Transparency is the Web3 spirit.', score: { anon: 0, public: 2 } }
+            ]
+        },
+        {
+            id: 's4',
+            text: 'When you see obvious misinformation or FUD (Fear, Uncertainty, Doubt) in the community, what do you do?',
+            options: [
+                { text: 'Scroll past silently, none of my business.', score: { anon: 2, public: 0 } },
+                { text: 'Might privately warn friends, but won\'t publicly refute it.', score: { anon: 1, public: 0 } },
+                { text: 'I will cite official docs or data to clarify it in public channels.', score: { anon: 0, public: 1 } },
+                { text: 'I will write a long thread analyzing the facts in detail, and @ the project team and KOLs to debunk the rumors.', score: { anon: 0, public: 2 } }
+            ]
+        },
+        {
+            id: 's5',
+            text: 'Which social experience do you enjoy more?',
+            options: [
+                { text: 'In an anonymous, decentralized forum, discussing purely based on content.', score: { anon: 2, public: 0 } },
+                { text: 'In a semi-anonymous small group, having deep conversations with a few like-minded friends.', score: { anon: 1, public: 0 } },
+                { text: 'In a public community, interacting with a large number of users and sharing opinions.', score: { anon: 0, public: 1 } },
+                { text: 'Being the center of attention in the community, having a massive follower count, and being able to influence the community\'s direction.', score: { anon: 0, public: 2 } }
+            ]
+        }
+    ]
+};
 
 const personalities = [
     { name: 'The Alpha Hunter', risk: 'Degen', motivation: 'Utility', time: 'Sniper', social: 'Public', description: 'Master of information. Uses public channels and information gaps to quickly discover early projects. Not only fast, but also loud about it. Dominates the info game and leverages every signal for maximum gain.' },
@@ -111,6 +231,23 @@ const personalities = [
 let currentQ = 0;
 let selected = {};
 let scores = { degen: 0, safe: 0, utility: 0, lore: 0, sniper: 0, hodler: 0, anon: 0, public: 0 };
+let currentQuestions = [];
+
+function pickRandom(arr, n) {
+    const shuffled = [...arr].sort(() => Math.random() - 0.5);
+    return shuffled.slice(0, n);
+}
+
+function generateQuiz() {
+    const dims = ['Risk', 'Motivation', 'Time', 'Social'];
+    const perDim = 2;
+    let quiz = [];
+    dims.forEach(dim => {
+        const picked = pickRandom(questionBank[dim], perDim);
+        picked.forEach(q => quiz.push({ ...q, dimension: dim }));
+    });
+    return quiz.sort(() => Math.random() - 0.5);
+}
 
 const startPage = document.getElementById('start-page');
 const testPage = document.getElementById('test-page');
@@ -136,18 +273,22 @@ retakeBtn.addEventListener('click', retakeTest);
 shareBtn.addEventListener('click', shareResult);
 
 function startTest() {
+    currentQuestions = generateQuiz();
+    currentQ = 0;
+    selected = {};
+    scores = { degen: 0, safe: 0, utility: 0, lore: 0, sniper: 0, hodler: 0, anon: 0, public: 0 };
     startPage.classList.remove('active');
     testPage.classList.add('active');
     loadQuestion();
 }
 
 function loadQuestion() {
-    const q = questions[currentQ];
+    const q = currentQuestions[currentQ];
     questionNum.textContent = `Q${currentQ + 1}`;
     dimTag.textContent = q.dimension;
     questionText.textContent = q.text;
 
-    progressFill.style.width = `${((currentQ + 1) / questions.length) * 100}%`;
+    progressFill.style.width = `${((currentQ + 1) / currentQuestions.length) * 100}%`;
 
     optionsContainer.innerHTML = '';
     q.options.forEach((opt, i) => {
@@ -159,7 +300,7 @@ function loadQuestion() {
     });
 
     prevBtn.disabled = currentQ === 0;
-    nextBtn.textContent = currentQ === questions.length - 1 ? 'Submit' : 'Next';
+    nextBtn.textContent = currentQ === currentQuestions.length - 1 ? 'Submit' : 'Next';
 }
 
 function selectOpt(index) {
@@ -184,7 +325,7 @@ function nextQuestion() {
         return;
     }
 
-    if (currentQ < questions.length - 1) {
+    if (currentQ < currentQuestions.length - 1) {
         currentQ++;
         loadQuestion();
     } else {
@@ -197,7 +338,7 @@ function calculateScores() {
     scores = { degen: 0, safe: 0, utility: 0, lore: 0, sniper: 0, hodler: 0, anon: 0, public: 0 };
     for (let i = 0; i < currentQ + 1; i++) {
         if (selected[i] !== undefined) {
-            const opt = questions[i].options[selected[i]];
+            const opt = currentQuestions[i].options[selected[i]];
             for (const [key, val] of Object.entries(opt.score)) {
                 scores[key] += val;
             }

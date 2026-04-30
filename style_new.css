@@ -603,13 +603,17 @@ h2 {
     font-weight: 700;
     font-size: 0.95rem;
     z-index: 1000;
-    transition: transform 0.4s ease;
+    transition: transform 0.4s ease, opacity 0.4s ease, visibility 0.4s;
     box-shadow: 0 4px 24px rgba(0, 255, 0, 0.4);
     pointer-events: none;
+    opacity: 0;
+    visibility: hidden;
 }
 
 .toast.show {
     transform: translateX(-50%) translateY(0);
+    opacity: 1;
+    visibility: visible;
 }
 
 @media (max-width: 768px) {
