@@ -241,6 +241,56 @@ document.getElementById('ec-login-btn').addEventListener('click', async () => {
     }
 });
 
+function extractEvmAddressFromMessage(message) {
+    const match = String(message || '').match(/0x[a-fA-F0-9]{40}/);
+    return match ? match[0] : '';
+}
+
+async function fetchEvmChallenge(address) {
+    const challengeRes = await fetch(`${AUTH_BASE}/login/evm-challenge`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ address })
+    });
+    const challengeData = await challengeRes.json();
+    if (!challengeData.success) {
+        throw new Error(challengeData.message || 'Failed to get challenge');
+    }
+    return challengeData.data.message;
+}
+
+async function signFreshEvmChallenge(address) {
+    let message = await fetchEvmChallenge(address);
+    const challengeAddress = extractEvmAddressFromMessage(message);
+
+    if (challengeAddress) {
+        if (challengeAddress.toLowerCase() !== address.toLowerCase()) {
+            throw new Error('Challenge wallet does not match the connected wallet');
+        }
+
+        if (challengeAddress !== address) {
+            message = await fetchEvmChallenge(challengeAddress);
+        }
+    }
+
+    const signingAddress = extractEvmAddressFromMessage(message) || challengeAddress || address;
+    const signature = await window.ethereum.request({
+        method: 'personal_sign',
+        params: [message, signingAddress]
+    });
+
+    return { message, signature };
+}
+
+async function submitEvmLogin(message, signature) {
+    const loginRes = await fetch(`${AUTH_BASE}/login/evm`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message, signature })
+    });
+    return loginRes.json();
+}
+
 document.getElementById('evm-login-btn').addEventListener('click', async () => {
     if (!window.ethereum) {
         showLoginError('MetaMask not detected. Please install MetaMask extension.');
@@ -255,29 +305,11 @@ document.getElementById('evm-login-btn').addEventListener('click', async () => {
         const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
         const address = accounts[0];
 
-        const challengeRes = await fetch(`${AUTH_BASE}/login/evm-challenge`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ address })
-        });
-        const challengeData = await challengeRes.json();
-        if (!challengeData.success) {
-            showLoginError(challengeData.message || 'Failed to get challenge');
-            return;
-        }
+        btn.textContent = 'Sign in MetaMask...';
+        const { message, signature } = await signFreshEvmChallenge(address);
+        btn.textContent = 'Verifying...';
+        const loginData = await submitEvmLogin(message, signature);
 
-        const message = challengeData.data.message;
-        const signature = await window.ethereum.request({
-            method: 'personal_sign',
-            params: [message, address]
-        });
-
-        const loginRes = await fetch(`${AUTH_BASE}/login/evm`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ message, signature })
-        });
-        const loginData = await loginRes.json();
         if (loginData.success) {
             saveSession(loginData.data.token, loginData.data.user);
             showStartPage();

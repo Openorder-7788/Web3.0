@@ -195,7 +195,7 @@ exports.getEvmChallenge = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Wallet address is required' });
     }
 
-    const origin = `${req.protocol}://${req.get('host')}`;
+    const origin = req.get('origin') || `${req.protocol}://${req.get('host')}`;
     const message = await dataClient.getEvmChallenge(address, 985, origin);
     res.json({ success: true, data: { message } });
   } catch (error) {
@@ -250,8 +250,15 @@ exports.loginWithEvm = async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('Login with EVM error:', error.message || error);
-    res.status(401).json({ success: false, message: error.message || 'Wallet login failed' });
+    console.error('Login with EVM error:', {
+      message: error.message || String(error),
+      statusCode: error.statusCode,
+      responseBody: error.responseBody
+    });
+    res.status(401).json({
+      success: false,
+      message: error.message || 'Wallet login failed'
+    });
   }
 };
 
