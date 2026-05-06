@@ -47,7 +47,9 @@ exports.submitResult = async (req, res) => {
       scores,
       description,
       userAgent: req.headers['user-agent'] || '',
-      ipAddress: req.ip || ''
+      ipAddress: req.ip || '',
+      userId: req.body.userId || null,
+      datadidUid: req.body.datadidUid || ''
     });
 
     res.status(201).json({

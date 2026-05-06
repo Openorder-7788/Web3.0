@@ -1,3 +1,312 @@
+const API_BASE = '/api/test';
+const AUTH_BASE = '/api/auth';
+
+let currentUser = null;
+let authToken = null;
+
+function loadSession() {
+    const token = localStorage.getItem('auth_token');
+    const user = localStorage.getItem('auth_user');
+    if (token && user) {
+        try {
+            authToken = token;
+            currentUser = JSON.parse(user);
+            return true;
+        } catch (e) {
+            localStorage.removeItem('auth_token');
+            localStorage.removeItem('auth_user');
+        }
+    }
+    return false;
+}
+
+function saveSession(token, user) {
+    authToken = token;
+    currentUser = user;
+    localStorage.setItem('auth_token', token);
+    localStorage.setItem('auth_user', JSON.stringify(user));
+}
+
+function clearSession() {
+    authToken = null;
+    currentUser = null;
+    localStorage.removeItem('auth_token');
+    localStorage.removeItem('auth_user');
+}
+
+function authHeaders() {
+    const headers = { 'Content-Type': 'application/json' };
+    if (authToken) {
+        headers['Authorization'] = `Bearer ${authToken}`;
+    }
+    return headers;
+}
+
+const loginPage = document.getElementById('login-page');
+const startPage = document.getElementById('start-page');
+const testPage = document.getElementById('test-page');
+const resultPage = document.getElementById('result-page');
+
+function showLoginPage() {
+    loginPage.classList.add('active');
+    startPage.classList.remove('active');
+    testPage.classList.remove('active');
+    resultPage.classList.remove('active');
+}
+
+function showStartPage() {
+    loginPage.classList.remove('active');
+    startPage.classList.add('active');
+    testPage.classList.remove('active');
+    resultPage.classList.remove('active');
+    updateUserBar();
+}
+
+function updateUserBar() {
+    const userBar = document.getElementById('user-bar');
+    const userInfo = document.getElementById('user-info');
+    if (currentUser) {
+        const display = currentUser.username || currentUser.email || currentUser.did || currentUser.datadidUid;
+        userInfo.textContent = display;
+        userBar.style.display = 'flex';
+    } else {
+        userBar.style.display = 'none';
+    }
+}
+
+function showLoginError(msg) {
+    const el = document.getElementById('login-error');
+    el.textContent = msg;
+    el.classList.remove('hidden');
+    setTimeout(() => el.classList.add('hidden'), 5000);
+}
+
+function hideLoginError() {
+    document.getElementById('login-error').classList.add('hidden');
+}
+
+document.querySelectorAll('.login-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+        document.querySelectorAll('.login-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        document.querySelectorAll('.login-form').forEach(f => f.classList.add('hidden'));
+        const target = tab.getAttribute('data-tab');
+        document.getElementById(`login-form-${target}`).classList.remove('hidden');
+        hideLoginError();
+    });
+});
+
+document.getElementById('ep-login-btn').addEventListener('click', async () => {
+    const email = document.getElementById('ep-email').value.trim();
+    const password = document.getElementById('ep-password').value;
+    if (!email || !password) { showLoginError('Please enter email and password'); return; }
+
+    const btn = document.getElementById('ep-login-btn');
+    btn.disabled = true;
+    btn.textContent = 'Logging in...';
+    try {
+        const res = await fetch(`${AUTH_BASE}/login/email-password`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password })
+        });
+        const data = await res.json();
+        if (data.success) {
+            saveSession(data.data.token, data.data.user);
+            showStartPage();
+        } else {
+            showLoginError(data.message || 'Login failed');
+        }
+    } catch (e) {
+        showLoginError('Network error, please try again');
+    } finally {
+        btn.disabled = false;
+        btn.textContent = 'Login';
+    }
+});
+
+document.getElementById('ep-register-btn').addEventListener('click', () => {
+    document.getElementById('register-overlay').classList.remove('hidden');
+    hideLoginError();
+});
+
+document.getElementById('reg-cancel-btn').addEventListener('click', () => {
+    document.getElementById('register-overlay').classList.add('hidden');
+});
+
+document.getElementById('reg-send-btn').addEventListener('click', async () => {
+    const email = document.getElementById('reg-email').value.trim();
+    if (!email) { showLoginError('Please enter your email'); return; }
+
+    const btn = document.getElementById('reg-send-btn');
+    btn.disabled = true;
+    btn.textContent = 'Sent';
+    try {
+        const res = await fetch(`${AUTH_BASE}/send-code`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email })
+        });
+        const data = await res.json();
+        if (!data.success) showLoginError(data.message || 'Failed to send code');
+    } catch (e) {
+        showLoginError('Network error');
+    } finally {
+        setTimeout(() => { btn.disabled = false; btn.textContent = 'Send Code'; }, 60000);
+    }
+});
+
+document.getElementById('reg-submit-btn').addEventListener('click', async () => {
+    const email = document.getElementById('reg-email').value.trim();
+    const code = document.getElementById('reg-code').value.trim();
+    const password = document.getElementById('reg-password').value;
+    const confirm = document.getElementById('reg-confirm').value;
+
+    if (!email || !code || !password || !confirm) { showLoginError('Please fill in all fields'); return; }
+    if (password !== confirm) { showLoginError('Passwords do not match'); return; }
+
+    const btn = document.getElementById('reg-submit-btn');
+    btn.disabled = true;
+    btn.textContent = 'Registering...';
+    try {
+        const res = await fetch(`${AUTH_BASE}/register`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, code, password })
+        });
+        const data = await res.json();
+        if (data.success) {
+            saveSession(data.data.token, data.data.user);
+            document.getElementById('register-overlay').classList.add('hidden');
+            showStartPage();
+        } else {
+            showLoginError(data.message || 'Registration failed');
+        }
+    } catch (e) {
+        showLoginError('Network error');
+    } finally {
+        btn.disabled = false;
+        btn.textContent = 'Register';
+    }
+});
+
+document.getElementById('ec-send-btn').addEventListener('click', async () => {
+    const email = document.getElementById('ec-email').value.trim();
+    if (!email) { showLoginError('Please enter your email'); return; }
+
+    const btn = document.getElementById('ec-send-btn');
+    btn.disabled = true;
+    btn.textContent = 'Sent';
+    try {
+        const res = await fetch(`${AUTH_BASE}/send-code`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email })
+        });
+        const data = await res.json();
+        if (!data.success) showLoginError(data.message || 'Failed to send code');
+    } catch (e) {
+        showLoginError('Network error');
+    } finally {
+        setTimeout(() => { btn.disabled = false; btn.textContent = 'Send Code'; }, 60000);
+    }
+});
+
+document.getElementById('ec-login-btn').addEventListener('click', async () => {
+    const email = document.getElementById('ec-email').value.trim();
+    const code = document.getElementById('ec-code').value.trim();
+    if (!email || !code) { showLoginError('Please enter email and verification code'); return; }
+
+    const btn = document.getElementById('ec-login-btn');
+    btn.disabled = true;
+    btn.textContent = 'Logging in...';
+    try {
+        const res = await fetch(`${AUTH_BASE}/login/email`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, code })
+        });
+        const data = await res.json();
+        if (data.success) {
+            saveSession(data.data.token, data.data.user);
+            showStartPage();
+        } else {
+            showLoginError(data.message || 'Login failed');
+        }
+    } catch (e) {
+        showLoginError('Network error');
+    } finally {
+        btn.disabled = false;
+        btn.textContent = 'Login';
+    }
+});
+
+document.getElementById('evm-login-btn').addEventListener('click', async () => {
+    if (!window.ethereum) {
+        showLoginError('MetaMask not detected. Please install MetaMask extension.');
+        return;
+    }
+
+    const btn = document.getElementById('evm-login-btn');
+    btn.disabled = true;
+    btn.textContent = 'Connecting...';
+
+    try {
+        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+        const address = accounts[0];
+
+        const challengeRes = await fetch(`${AUTH_BASE}/login/evm-challenge`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ address })
+        });
+        const challengeData = await challengeRes.json();
+        if (!challengeData.success) {
+            showLoginError(challengeData.message || 'Failed to get challenge');
+            return;
+        }
+
+        const message = challengeData.data.message;
+        const signature = await window.ethereum.request({
+            method: 'personal_sign',
+            params: [message, address]
+        });
+
+        const loginRes = await fetch(`${AUTH_BASE}/login/evm`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message, signature })
+        });
+        const loginData = await loginRes.json();
+        if (loginData.success) {
+            saveSession(loginData.data.token, loginData.data.user);
+            showStartPage();
+        } else {
+            showLoginError(loginData.message || 'Wallet login failed');
+        }
+    } catch (e) {
+        if (e.code === 4001) {
+            showLoginError('You rejected the signature request');
+        } else {
+            showLoginError('Wallet connection failed: ' + (e.message || 'Unknown error'));
+        }
+    } finally {
+        btn.disabled = false;
+        btn.textContent = 'Connect Wallet';
+    }
+});
+
+document.getElementById('logout-btn').addEventListener('click', () => {
+    clearSession();
+    showLoginPage();
+});
+
+if (loadSession()) {
+    showStartPage();
+} else {
+    showLoginPage();
+}
+
 const questionBank = {
     Risk: [
         {
@@ -249,9 +558,6 @@ function generateQuiz() {
     return quiz.sort(() => Math.random() - 0.5);
 }
 
-const startPage = document.getElementById('start-page');
-const testPage = document.getElementById('test-page');
-const resultPage = document.getElementById('result-page');
 const startBtn = document.getElementById('start-btn');
 const prevBtn = document.getElementById('prev-btn');
 const nextBtn = document.getElementById('next-btn');
@@ -377,6 +683,42 @@ function showResult() {
 
     testPage.classList.remove('active');
     resultPage.classList.add('active');
+
+    submitToBackend(matched, typeCode, riskType, motivationType, timeType, socialType);
+}
+
+async function submitToBackend(personality, typeCode, risk, motivation, time, social) {
+    try {
+        const headers = { 'Content-Type': 'application/json' };
+        if (authToken) {
+            headers['Authorization'] = `Bearer ${authToken}`;
+        }
+        const body = {
+            personalityName: personality.name,
+            typeCode: typeCode,
+            dimensions: { risk, motivation, time, social },
+            scores: scores,
+            description: personality.description
+        };
+        if (currentUser) {
+            body.userId = currentUser.id;
+            body.datadidUid = currentUser.datadidUid;
+        }
+        const response = await fetch(`${API_BASE}/submit`, {
+            method: 'POST',
+            headers,
+            body: JSON.stringify(body)
+        });
+
+        const data = await response.json();
+        if (data.success) {
+            console.log('Result saved to server:', data.data.id);
+        } else {
+            console.warn('Server rejected result:', data.message);
+        }
+    } catch (error) {
+        console.warn('Could not save result to server:', error.message);
+    }
 }
 
 function updateBar(dim, leftScore, rightScore, leftLabel, rightLabel) {

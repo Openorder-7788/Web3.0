@@ -10,7 +10,80 @@
     <canvas id="bg-canvas"></canvas>
 
     <div class="container">
-        <div class="page active" id="start-page">
+        <div class="page active" id="login-page">
+            <div class="corner-deco top-left"></div>
+            <div class="corner-deco top-right"></div>
+            <div class="corner-deco bottom-left"></div>
+            <div class="corner-deco bottom-right"></div>
+
+            <div class="content login-content">
+                <div class="logo-icon">&#x2B22;</div>
+                <h1>Web3.0 Personality Test</h1>
+                <p class="subtitle">Login with DataDID to start</p>
+
+                <div class="login-tabs">
+                    <button class="login-tab active" data-tab="email-password">Email + Password</button>
+                    <button class="login-tab" data-tab="email-code">Email + Code</button>
+                    <button class="login-tab" data-tab="evm-wallet">EVM Wallet</button>
+                </div>
+
+                <div class="login-form" id="login-form-email-password">
+                    <div class="form-group">
+                        <input type="email" id="ep-email" placeholder="Email address" autocomplete="email">
+                    </div>
+                    <div class="form-group">
+                        <input type="password" id="ep-password" placeholder="Password" autocomplete="current-password">
+                    </div>
+                    <button class="btn btn-primary btn-full" id="ep-login-btn">Login</button>
+                    <div class="form-divider"><span>or</span></div>
+                    <button class="btn btn-outline btn-full" id="ep-register-btn">Create Account</button>
+                </div>
+
+                <div class="login-form hidden" id="login-form-email-code">
+                    <div class="form-group">
+                        <input type="email" id="ec-email" placeholder="Email address" autocomplete="email">
+                    </div>
+                    <div class="form-group code-group">
+                        <input type="text" id="ec-code" placeholder="Verification code" maxlength="6">
+                        <button class="btn btn-ghost btn-code" id="ec-send-btn">Send Code</button>
+                    </div>
+                    <button class="btn btn-primary btn-full" id="ec-login-btn">Login</button>
+                </div>
+
+                <div class="login-form hidden" id="login-form-evm-wallet">
+                    <div class="wallet-info">
+                        <div class="wallet-icon">&#x1F517;</div>
+                        <p>Connect your MetaMask or other EVM wallet to login with DataDID</p>
+                    </div>
+                    <button class="btn btn-primary btn-full" id="evm-login-btn">Connect Wallet</button>
+                </div>
+
+                <div class="register-overlay hidden" id="register-overlay">
+                    <div class="register-card">
+                        <h3>Create Account</h3>
+                        <div class="form-group">
+                            <input type="email" id="reg-email" placeholder="Email address" autocomplete="email">
+                        </div>
+                        <div class="form-group code-group">
+                            <input type="text" id="reg-code" placeholder="Verification code" maxlength="6">
+                            <button class="btn btn-ghost btn-code" id="reg-send-btn">Send Code</button>
+                        </div>
+                        <div class="form-group">
+                            <input type="password" id="reg-password" placeholder="Set password" autocomplete="new-password">
+                        </div>
+                        <div class="form-group">
+                            <input type="password" id="reg-confirm" placeholder="Confirm password" autocomplete="new-password">
+                        </div>
+                        <button class="btn btn-primary btn-full" id="reg-submit-btn">Register</button>
+                        <button class="btn btn-ghost btn-full" id="reg-cancel-btn">Cancel</button>
+                    </div>
+                </div>
+
+                <p class="login-error hidden" id="login-error"></p>
+            </div>
+        </div>
+
+        <div class="page" id="start-page">
             <div class="corner-deco top-left"></div>
             <div class="corner-deco top-right"></div>
             <div class="corner-deco bottom-left"></div>
@@ -34,6 +107,10 @@
             </div>
 
             <div class="content">
+                <div class="user-bar" id="user-bar">
+                    <span class="user-info" id="user-info"></span>
+                    <button class="btn btn-ghost btn-sm" id="logout-btn">Logout</button>
+                </div>
                 <div class="logo-icon">&#x2B22;</div>
                 <h1>Web3.0 Personality Test</h1>
                 <p class="subtitle">Discover your true Web3 identity</p>

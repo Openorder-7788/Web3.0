@@ -10,8 +10,8 @@ const TestResult = {
         personality_name, type_code, risk, motivation, time_dim, social,
         score_degen, score_safe, score_utility, score_lore,
         score_sniper, score_hodler, score_anon, score_public,
-        description, user_agent, ip_address
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        description, user_agent, ip_address, user_id, datadid_uid
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
     const params = [
@@ -31,7 +31,9 @@ const TestResult = {
       data.scores.public,
       data.description,
       data.userAgent || '',
-      data.ipAddress || ''
+      data.ipAddress || '',
+      data.userId || null,
+      data.datadidUid || ''
     ];
 
     const [result] = await pool.execute(sql, params);

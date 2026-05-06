@@ -7,7 +7,6 @@ const rateLimit = require('express-rate-limit');
 const path = require('path');
 const { connectDB } = require('./config/db');
 const testRoutes = require('./routes/test');
-const authRoutes = require('./routes/auth');
 
 const app = express();
 
@@ -32,7 +31,6 @@ const limiter = rateLimit({
 app.use('/api/', limiter);
 
 app.use('/api/test', testRoutes);
-app.use('/api/auth', authRoutes);
 
 app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', message: 'Web3 Personality Test API is running' });
