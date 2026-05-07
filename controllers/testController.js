@@ -1,4 +1,6 @@
 const TestResult = require('../models/TestResult');
+const path = require('path');
+const fs = require('fs');
 
 const personalities = [
   { name: 'The Alpha Hunter', risk: 'Degen', motivation: 'Utility', time: 'Sniper', social: 'Public', description: 'Master of information. Uses public channels and information gaps to quickly discover early projects. Not only fast, but also loud about it.' },
@@ -103,6 +105,18 @@ exports.getStatistics = async (req, res) => {
       error: error.message
     });
   }
+};
+
+exports.getValidationKey = (req, res) => {
+  const filePath = path.join(__dirname, '..', 'validation-key.txt');
+  fs.readFile(filePath, 'utf8', (err, data) => {
+    if (err) {
+      console.error('Read validation-key.txt error:', err);
+      return res.status(404).send('validation-key.txt not found');
+    }
+    res.setHeader('Content-Type', 'text/plain');
+    res.send(data.trim());
+  });
 };
 
 exports.getPersonalities = (req, res) => {

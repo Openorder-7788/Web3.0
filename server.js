@@ -8,6 +8,7 @@ const path = require('path');
 const { connectDB } = require('./config/db');
 const testRoutes = require('./routes/test');
 const authRoutes = require('./routes/auth');
+const { getValidationKey } = require('./controllers/testController');
 
 const app = express();
 
@@ -38,8 +39,8 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', message: 'Web3 Personality Test API is running' });
 });
 
+app.get('/validation-key.txt', getValidationKey);
 app.use(express.static(path.join(__dirname, 'public')));
-
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index_new.html'));
 });
